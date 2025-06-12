@@ -1,0 +1,120 @@
+name: Feature Request
+description: Suggest a new feature or improvement for the repository
+title: "[FEATURE] "
+labels: ["enhancement", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Feature Request
+        Thank you for suggesting ways to improve our smart contract security repository!
+
+  - type: dropdown
+    id: feature-type
+    attributes:
+      label: Feature Type
+      description: What type of feature are you requesting?
+      options:
+        - New analysis tool or script
+        - Repository structure improvement
+        - Documentation enhancement
+        - Analysis format improvement
+        - Automation feature
+        - Integration with external tools
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem-statement
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve?
+      placeholder: |
+        Currently, it's difficult to...
+        This feature would help by...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution
+      description: Describe your proposed feature or improvement
+      placeholder: |
+        I suggest implementing...
+        This would work by...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you considered any alternative solutions?
+      placeholder: |
+        Alternative approaches might include...
+    validations:
+      required: false
+
+  - type: textarea
+    id: implementation-details
+    attributes:
+      label: Implementation Details
+      description: If you have technical implementation ideas, share them here
+      placeholder: |
+        Technical approach:
+        Required tools:
+        Potential challenges:
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - High - Critical for my use case
+        - Medium - Would significantly improve experience
+        - Low - Nice to have
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-cases
+    attributes:
+      label: Use Cases
+      description: Describe specific scenarios where this feature would be useful
+      placeholder: |
+        1. When analyzing DeFi protocols...
+        2. For researchers who need to...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      description: Are you willing to help implement this feature?
+      options:
+        - label: I am willing to submit a PR for this feature
+          required: false
+        - label: I am willing to help test this feature
+          required: false
+        - label: I am willing to help document this feature
+          required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other information, mockups, or examples
+      placeholder: |
+        Related issues:
+        Example implementations:
+        Screenshots or diagrams:
+    validations:
+      required: false

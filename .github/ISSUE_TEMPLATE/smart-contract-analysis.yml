@@ -1,0 +1,220 @@
+name: Smart Contract Analysis Submission
+description: Submit a new smart contract security analysis
+title: "[ANALYSIS] Contract Name - Network"
+labels: ["analysis", "new-submission"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Smart Contract Analysis Submission
+        Thank you for contributing to our smart contract security analysis repository! Please provide detailed information about your analysis.
+
+  - type: input
+    id: contract-name
+    attributes:
+      label: Contract Name
+      description: The name of the smart contract being analyzed
+      placeholder: "e.g., UniswapV3Pool"
+    validations:
+      required: true
+
+  - type: input
+    id: contract-address
+    attributes:
+      label: Contract Address
+      description: The deployed contract address (use 0x format)
+      placeholder: "0x..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: network
+    attributes:
+      label: Network
+      description: Which blockchain network is this contract deployed on?
+      options:
+        - Ethereum Mainnet
+        - BSC (Binance Smart Chain)
+        - Polygon
+        - Arbitrum
+        - Optimism
+        - Avalanche
+        - Fantom
+        - Base
+        - zkSync Era
+        - Other (specify in additional context)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: contract-type
+    attributes:
+      label: Contract Type
+      description: What type of smart contract is this?
+      multiple: true
+      options:
+        - DeFi Protocol
+        - DEX/AMM
+        - Lending/Borrowing
+        - Staking
+        - NFT
+        - Token (ERC20/721/1155)
+        - Governance
+        - Bridge
+        - Oracle
+        - Vault/Strategy
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: audit-status
+    attributes:
+      label: Audit Status
+      description: Has this contract been professionally audited?
+      options:
+        - Audited (with public report)
+        - Audited (no public report)
+        - Unaudited
+        - Unknown
+    validations:
+      required: true
+
+  - type: input
+    id: audit-links
+    attributes:
+      label: Audit Report Links
+      description: If audited, provide links to audit reports
+      placeholder: "https://..."
+
+  - type: textarea
+    id: vulnerability-summary
+    attributes:
+      label: Vulnerability Summary
+      description: Provide a brief summary of vulnerabilities found
+      placeholder: |
+        - Critical: 0
+        - High: 2
+        - Medium: 3
+        - Low: 5
+        - Informational: 8
+    validations:
+      required: true
+
+  - type: textarea
+    id: critical-findings
+    attributes:
+      label: Critical/High Severity Findings
+      description: Detail any critical or high severity vulnerabilities
+      placeholder: |
+        1. **Reentrancy Attack in withdraw()**
+           - Severity: High
+           - Impact: Potential loss of funds
+           - Description: The withdraw function updates balance after external call...
+    validations:
+      required: false
+
+  - type: textarea
+    id: attack-scenarios
+    attributes:
+      label: Attack Scenarios
+      description: Describe potential attack vectors and exploitation methods
+      placeholder: |
+        Describe how an attacker could exploit the vulnerabilities...
+    validations:
+      required: false
+
+  - type: textarea
+    id: code-snippets
+    attributes:
+      label: Vulnerable Code Snippets
+      description: Include relevant code snippets that demonstrate the issues
+      placeholder: |
+        ```solidity
+        function withdraw(uint256 amount) external {
+            require(balances[msg.sender] >= amount);
+            (bool success, ) = msg.sender.call{value: amount}("");
+            require(success);
+            balances[msg.sender] -= amount; // State update after external call
+        }
+        ```
+    validations:
+      required: false
+
+  - type: textarea
+    id: recommendations
+    attributes:
+      label: Recommendations
+      description: Provide recommendations for fixing the vulnerabilities
+      placeholder: |
+        1. Implement checks-effects-interactions pattern
+        2. Use ReentrancyGuard from OpenZeppelin
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: tools-used
+    attributes:
+      label: Analysis Tools Used
+      description: List the tools and methods used for this analysis
+      placeholder: |
+        - Slither
+        - Mythril
+        - Manual Review
+        - Foundry Tests
+    validations:
+      required: true
+
+  - type: input
+    id: tvl
+    attributes:
+      label: Total Value Locked (TVL)
+      description: If applicable, what is the TVL of this protocol?
+      placeholder: "$1.5M"
+
+  - type: input
+    id: related-incidents
+    attributes:
+      label: Related Security Incidents
+      description: Has this contract or similar contracts been exploited before?
+      placeholder: "Link to incident report or 'None known'"
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any additional information about the analysis
+      placeholder: |
+        - Analysis methodology
+        - Time spent on analysis
+        - Collaboration with other researchers
+        - References to similar vulnerabilities
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Submission Checklist
+      description: Please confirm the following
+      options:
+        - label: I have thoroughly analyzed the smart contract code
+          required: true
+        - label: I have verified the contract source code matches the deployed bytecode
+          required: true
+        - label: I have checked for known vulnerability patterns
+          required: true
+        - label: I have not included any private keys or sensitive information
+          required: true
+        - label: This analysis is my own work or properly attributed
+          required: true
+        - label: I understand this is for educational purposes only
+          required: true
+
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Information (Optional)
+      description: How can we reach you for follow-up questions?
+      placeholder: "Email: alessandro.vettor@egloo.it"

@@ -1,0 +1,105 @@
+name: Bug Report
+description: Report a bug or error in an existing analysis
+title: "[BUG] "
+labels: ["bug", "needs-review"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Bug Report
+        Thank you for helping us improve our smart contract analyses. Please provide detailed information about the issue you've found.
+
+  - type: dropdown
+    id: bug-type
+    attributes:
+      label: Bug Type
+      description: What type of issue are you reporting?
+      options:
+        - Incorrect vulnerability assessment
+        - Wrong code reference
+        - Calculation error
+        - Factual error
+        - Broken link or reference
+        - Typo or formatting issue
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: analysis-location
+    attributes:
+      label: Analysis Location
+      description: Which analysis contains the bug?
+      placeholder: "e.g., /analyses/uniswap/2024-01-15-UniswapV3-Analysis.md"
+    validations:
+      required: true
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Bug Description
+      description: Describe the issue in detail
+      placeholder: |
+        A clear and concise description of what the bug is...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-content
+    attributes:
+      label: Expected Content
+      description: What should the correct information be?
+      placeholder: |
+        The correct information should be...
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Supporting Evidence
+      description: Provide evidence for your correction (links, code, documentation)
+      placeholder: |
+        - Link to documentation: 
+        - Code reference:
+        - Transaction hash:
+    validations:
+      required: false
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Impact Severity
+      description: How severe is this error?
+      options:
+        - Critical - Completely wrong security assessment
+        - High - Significant factual errors
+        - Medium - Important details incorrect
+        - Low - Minor errors or typos
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other relevant information
+      placeholder: |
+        Add any other context about the problem here...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have checked that this bug hasn't been reported before
+          required: true
+        - label: I have provided evidence for my correction
+          required: false
+        - label: I am willing to submit a PR to fix this issue
+          required: false
