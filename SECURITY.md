@@ -17,7 +17,7 @@ We appreciate your efforts to responsibly disclose your findings and will make e
 If you discover a security vulnerability in this repository (website, documentation, or analysis tools):
 
 1. **DO NOT** open a public issue
-2. Email us at: alessandro.vettor@example.com
+2. Email us at: alessandro.vettor@egloo.it
 3. Include the following information:
    - Type of issue (e.g., XSS, SQL injection, authentication bypass)
    - Full paths of source file(s) related to the manifestation of the issue
