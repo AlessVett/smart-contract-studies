@@ -17,11 +17,23 @@ are added.
 ```
 smart-contract-studies/
 ├── tokens/         # ERC20, ERC721, and other token standards  [populated]
+├── tools/          # Analysis utilities  [populated]
 ├── defi/           # DeFi protocols (AMMs, lending, yield farming)  [planned]
 ├── nft/            # NFT contracts and marketplaces  [planned]
-├── dao/            # DAO and governance contracts  [planned]
-└── tools/          # Utility contracts and development tools  [planned]
+└── dao/            # DAO and governance contracts  [planned]
 ```
+
+## Tools
+
+| Tool | Purpose |
+|---|---|
+| [`onchain_profile.py`](tools/onchain_profile.py) | Profiles a deployed ERC20: ownership, deployer funding trail, supply distribution, holder concentration, and recovery-function safety. No dependencies. |
+
+```bash
+python3 tools/onchain_profile.py 0x9eAeBd7E73D97E78c77fAB743e6FFA1b550e224c
+```
+
+See [tools/README.md](tools/README.md) for options and caveats.
 
 Each study directory follows the layout described in
 [CONTRIBUTING.md](CONTRIBUTING.md#file-structure).
