@@ -18,6 +18,12 @@ documentation to Smart Contract Studies, as described in
 | On-chain forensic analysis | [@AlessVett](https://github.com/AlessVett) |
 | Severity classification and deep-dive findings | [@AlessVett](https://github.com/AlessVett) |
 
+### Rexas Presale — `defi/RexasPresale/`
+
+| Contribution | Contributor |
+|---|---|
+| Security analysis and on-chain verification of the $56M token sale | [@AlessVett](https://github.com/AlessVett) |
+
 ## Tooling
 
 | Contribution | Contributor |
