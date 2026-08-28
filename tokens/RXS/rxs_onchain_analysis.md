@@ -41,7 +41,7 @@ Live read of `owner()` (selector `0x8da5cb5b`):
 |---|---|
 | Account type | **EOA** — single private key, not a multisig or timelock |
 | Same as deployer | Yes — creation tx `0x496ab249…ea2ac5`, block 20700162, 2024-09-07 17:17:11 UTC |
-| `OwnershipTransferred` events since deployment | **0** — never transferred, never renounced |
+| `OwnershipTransferred` events | **1 only** — the constructor's initialisation (`0x0` → deployer, block 20700162). **No transfer after deployment**, and never renounced |
 | Third-party label | Blockscout: "Rexas Finance: Deployer" |
 | RXS held | 30,000,000 (3.00% of supply) |
 
@@ -350,9 +350,17 @@ R=https://ethereum-rpc.publicnode.com
 ```bash
 cast call $RXS "owner()(address)" --rpc-url $R
 
-# Ownership transfer history from the deployment block (0x13BDF42 = 20700162)
-curl -s -X POST $R -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":1,"method":"eth_getLogs","params":[{"address":"'"$RXS"'","topics":["0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0"],"fromBlock":"0x13BDF42","toBlock":"latest"}]}'
+# Ownership history, via the explorer's log index.
+#
+# Do NOT use eth_getLogs against a free public node for this: most reject
+# historical ranges, and some return an EMPTY LIST rather than an error —
+# which reads as "never transferred" and is the wrong conclusion.
+curl -s -A "Mozilla/5.0" "https://eth.blockscout.com/api?module=logs&action=getLogs\
+&fromBlock=0&toBlock=latest&address=$RXS\
+&topic0=0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0"
 ```
+
+**Reading the result.** `Ownable`'s constructor emits `OwnershipTransferred(0x0, deployer)` at deployment, so an Ownable contract never shows zero events. What matters is whether any event has a non-zero `from`: for RXS there is none, so ownership has never moved since construction.
 
 **Presale accounting**
 

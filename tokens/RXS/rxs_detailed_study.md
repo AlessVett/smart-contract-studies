@@ -232,7 +232,7 @@ It's a solid contract for a basic utility token, but requires attention to centr
 
 **Impact.** Compromise of that key exposes: any assets held by the contract, and the ability to grant whitelist exemptions. It does **not** allow minting, freezing balances, taxing transfers or upgrading code, none of which exist. `enableTrading` is one-way and, on the deployed contract, already spent — so trading cannot be re-disabled by anyone, including a key thief.
 
-**Evidence.** Confirmed on the deployed contract: `owner()` still returns the deployer address, with zero `OwnershipTransferred` events since 2024-09-07. See `rxs_onchain_analysis.md` §2.
+**Evidence.** Confirmed on the deployed contract: `owner()` still returns the deployer address, and the only `OwnershipTransferred` event is the constructor's initialisation (`0x0` → deployer) at block 20700162 — no transfer has occurred since. See `rxs_onchain_analysis.md` §2.
 
 **Recommendation.** Transfer ownership to a multisig. Do **not** renounce it: renouncement would permanently strand any assets later sent to the contract by disabling both recovery functions.
 
