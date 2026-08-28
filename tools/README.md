@@ -55,14 +55,33 @@ them by mistake. If it calls the token through an interface declaring
 it: the function looks correct.
 
 The probe simulates each known recovery signature twice against live chain
-state — once with USDT, once with a compliant token as a control — and reports
-a function as unsafe only when it succeeds with the compliant token and reverts
-with USDT. The control run matters: a missing function also reverts, and
-without it every absent function would be flagged.
+state — once with USDT, once with USDC as a compliant control — and reports a
+function as unsafe only when it succeeds with the control and reverts with
+USDT. Two details make it reliable:
 
-Running it against RXS surfaces a live instance: 2,320.36 USDT permanently
-stuck. See [`tokens/RXS/rxs_detailed_study.md`](../tokens/RXS/rxs_detailed_study.md)
-finding L-01.
+- **The control run.** A missing function also reverts, so without a control
+  every absent function would be flagged.
+- **A zero amount.** A compliant ERC20 accepts a zero-value transfer without
+  needing a balance, so the probe discriminates purely on return data — the
+  actual defect — rather than on whether the contract happens to hold the
+  probe token.
+
+Because the control token is independent of the contract under test, the probe
+works on any contract with a recovery function, not only on ERC20s. That
+matters: an earlier version used the contract itself as the control, which
+silently reported nothing for a presale, a vault or a staking contract.
+
+Two live instances found so far, both from the same team:
+
+| Contract | Function | Stuck |
+|---|---|---|
+| [RXS token](../tokens/RXS/) | `removeStuckToken` | 2,320.36 USDT |
+| [Rexas Presale](../defi/RexasPresale/) | `WithdrawTokens` | 46.85 USDT |
+
+Note the capitalisation of the second: selectors are case-sensitive, so
+`WithdrawTokens` and `withdrawTokens` are different functions. Signature lists
+have to cover the variants contracts actually use, not the ones the style guide
+recommends.
 
 ### Two traps it handles
 

@@ -32,6 +32,7 @@ UA = "smart-contract-studies/onchain_profile"
 
 # Well-known mainnet addresses used as probes and reference points.
 USDT = "0xdAC17F958D2ee523a2206206994597C13D831ec7"  # returns no data from transfer()
+USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"  # compliant control token
 ZERO = "0x0000000000000000000000000000000000000000"
 
 # keccak256("Transfer(address,address,uint256)")
@@ -425,6 +426,13 @@ RECOVERY_SIGNATURES = [
     "rescueToken(address,address,uint256)",
     "recoverERC20(address,uint256)",
     "withdrawToken(address,uint256)",
+    "withdrawTokens(address,uint256)",
+    # Capitalised variants: Solidity style guides say lowerCamelCase, but
+    # contracts in the wild frequently ignore that, and selectors are
+    # case-sensitive — WithdrawTokens and withdrawTokens are different
+    # functions. Found on Rexas_Presale, which this list initially missed.
+    "WithdrawTokens(address,uint256)",
+    "WithdrawToken(address,uint256)",
     "clearStuckToken(address,uint256)",
 ]
 
@@ -443,36 +451,28 @@ def section_recovery(chain, token, owner):
         out["note"] = "no owner to simulate from; recovery probe skipped"
         return out
 
-    recipient = owner
+    def encode(sig, token_arg, amount):
+        sel = selector(sig)
+        word = token_arg[2:].rjust(64, "0").lower()
+        if sig.count(",") + 1 == 3:  # (token, recipient, amount)
+            return sel + word + owner[2:].rjust(64, "0").lower() + f"{amount:064x}"
+        return sel + word + f"{amount:064x}"  # (token, amount)
+
+    # Amount 0 on purpose. A compliant ERC20 accepts a zero-value transfer
+    # without needing a balance, so the probe discriminates purely on return
+    # data — the actual defect — rather than on whether the contract happens
+    # to hold the probe token.
     for sig in RECOVERY_SIGNATURES:
-        sel = selector(sig)
-        arg_count = sig.count(",") + 1
-        # Encode: (token, recipient, amount) or (token, amount)
-        if arg_count == 3:
-            data = (sel
-                    + USDT[2:].rjust(64, "0").lower()
-                    + recipient[2:].rjust(64, "0").lower()
-                    + f"{1:064x}")
-        else:
-            data = sel + USDT[2:].rjust(64, "0").lower() + f"{1:064x}"
-
-        res = chain.eth_call(token, data, frm=owner)
-        # A missing function also reverts, so distinguish via the compliant
-        # control probe below rather than treating every revert as the bug.
-        out["probed"].append({"signature": sig, "reverts_with_usdt": res is None})
-
-    # Control: does any probed function exist at all? Use the token itself,
-    # which is ERC20-compliant by construction.
-    for entry in out["probed"]:
-        sig = entry["signature"]
-        sel = selector(sig)
-        arg_count = sig.count(",") + 1
-        if arg_count == 3:
-            data = (sel + token[2:].rjust(64, "0").lower()
-                    + recipient[2:].rjust(64, "0").lower() + f"{1:064x}")
-        else:
-            data = sel + token[2:].rjust(64, "0").lower() + f"{1:064x}"
-        entry["succeeds_with_compliant_token"] = chain.eth_call(token, data, frm=owner) is not None
+        # A missing function also reverts, so the control below decides.
+        reverts = chain.eth_call(token, encode(sig, USDT, 0), frm=owner) is None
+        # Control uses USDC, a compliant token that exists independently of
+        # the contract under test. Using the contract itself only works when
+        # it is an ERC20; it silently fails for anything else (a presale, a
+        # vault, a staking contract), which is how this was found.
+        exists = chain.eth_call(token, encode(sig, USDC, 0), frm=owner) is not None
+        out["probed"].append({"signature": sig,
+                              "reverts_with_usdt": reverts,
+                              "succeeds_with_compliant_token": exists})
 
     vulnerable = [e for e in out["probed"]
                   if e["succeeds_with_compliant_token"] and e["reverts_with_usdt"]]
