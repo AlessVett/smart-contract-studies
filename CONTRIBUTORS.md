@@ -18,6 +18,12 @@ documentation to Smart Contract Studies, as described in
 | On-chain forensic analysis | [@AlessVett](https://github.com/AlessVett) |
 | Severity classification and deep-dive findings | [@AlessVett](https://github.com/AlessVett) |
 
+## Tooling
+
+| Contribution | Contributor |
+|---|---|
+| `tools/onchain_profile.py` — ERC20 on-chain profiler with recovery-function safety probe | [@AlessVett](https://github.com/AlessVett) |
+
 ## Adding Yourself
 
 When your pull request is merged, add an entry here in the same commit
