@@ -1,0 +1,41 @@
+# IDE and editor state
+.idea/
+.vscode/
+*.iml
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Foundry
+out/
+cache/
+broadcast/
+
+# Hardhat
+artifacts/
+cache_hardhat/
+typechain/
+typechain-types/
+
+# Python (analysis scripts)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local analysis scratch
+*.local.md
+scratch/
