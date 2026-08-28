@@ -405,6 +405,8 @@ cast call 0xdAC17F958D2ee523a2206206994597C13D831ec7 "balanceOf(address)(uint256
 
 Per the contributing guidelines, original findings are preserved; the following data points are corrected here with their date. These do not affect the conclusions of the companion document.
 
+> **Status update (2026-08-28).** All four corrections below have since been incorporated directly into `rxs_detailed_study.md` — items 1 and 2 in its new section 12 (Verification Status), items 3 and 4 in its Executive Summary and finding M-01. They are retained here as the record of what was corrected and when.
+
 **2026-08-28**
 
 1. **Compiler version.** The static study lists `^0.8.20` (the pragma). The verified deployed build is **`0.8.26+commit.8a97fa7a`**, EVM version Cancun, optimiser disabled.
