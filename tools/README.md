@@ -22,6 +22,7 @@ signatures resolve without a crypto library.
 | Section | Answers |
 |---|---|
 | Identity | supply, decimals, verification status, proxy/upgradeability |
+| Supply mechanics | whether supply is elastic (rebase), and how it has moved |
 | Ownership | current owner, EOA or contract, transfer history |
 | Deployer & funding trail | who deployed it, and where their first ETH came from |
 | Supply distribution | where the initial supply actually went |
@@ -82,6 +83,24 @@ Note the capitalisation of the second: selectors are case-sensitive, so
 `WithdrawTokens` and `withdrawTokens` are different functions. Signature lists
 have to cover the variants contracts actually use, not the ones the style guide
 recommends.
+
+### Elastic supply detection
+
+`totalSupply()` is not always a fixed quantity. Rebase tokens rescale it, and
+every holder's balance moves with it. Reporting that number flat is misleading:
+market data for such tokens is routinely years out of date, and any
+share-of-supply figure computed against a stale value is wrong by whatever the
+supply has done since.
+
+The tool looks for `LogRebase` events and a `monetaryPolicy()` getter. When it
+finds them it marks the supply `<< ELASTIC` and adds a section with the rebase
+count, the supply at first and latest rebase, the total growth factor, and any
+long dormancy — because a five-year pause followed by a burst is a different
+story from steady operation, and the reader should see it.
+
+Running it against LEASH reports 315 rebases and a 6.4 trillion× growth factor
+against a published supply figure frozen in 2020. That discrepancy is what
+prompted the [LEASH study](../tokens/LEASH/).
 
 ### Two traps it handles
 

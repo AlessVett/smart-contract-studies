@@ -24,6 +24,12 @@ documentation to Smart Contract Studies, as described in
 |---|---|
 | Security analysis and on-chain verification of the $56M token sale | [@AlessVett](https://github.com/AlessVett) |
 
+### LEASH — `tokens/LEASH/`
+
+| Contribution | Contributor |
+|---|---|
+| Rebase mechanism and control-chain analysis | [@AlessVett](https://github.com/AlessVett) |
+
 ## Tooling
 
 | Contribution | Contributor |
