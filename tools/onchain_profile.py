@@ -39,6 +39,8 @@ ZERO = "0x0000000000000000000000000000000000000000"
 TOPIC_TRANSFER = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
 # keccak256("OwnershipTransferred(address,address)")
 TOPIC_OWNERSHIP = "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0"
+# keccak256("LogRebase(uint256,uint256)") — Ampleforth/uFragments supply change
+TOPIC_REBASE = "0x72725a3b1e5bd622d6bcd1339bb31279c351abe8f541ac7fd320f24e1b1641f2"
 
 
 # --------------------------------------------------------------------------
@@ -393,6 +395,65 @@ def section_holders(chain, token, decimals, supply, limit):
     return out
 
 
+def section_supply_mechanics(chain, addr, decimals, current_supply):
+    """Detects elastic (rebase) supply.
+
+    A rebase token's totalSupply is not a fixed quantity — it is rescaled by a
+    monetary policy, and every holder's balance moves with it. Reporting that
+    number without saying so is actively misleading: market data for such a
+    token is routinely years out of date, and any share-of-supply figure
+    computed against a stale value is wrong by whatever the supply has done
+    since.
+    """
+    out = {"is_rebase": False}
+
+    policy = dec_addr(chain.eth_call(addr, selector("monetaryPolicy()")))
+    if policy and policy.lower() != ZERO:
+        out["monetary_policy"] = policy
+
+    try:
+        data = chain.api(f"/api?module=logs&action=getLogs&fromBlock=0"
+                         f"&toBlock=latest&address={addr}&topic0={TOPIC_REBASE}")
+        logs = data.get("result")
+        if not isinstance(logs, list) or not logs:
+            return out
+    except ChainError as e:
+        out["error"] = str(e)
+        return out
+
+    events = []
+    for l in logs:
+        try:
+            events.append({"block": int(l["blockNumber"], 16),
+                           "supply": units(int(l["data"], 16), decimals)})
+        except (KeyError, ValueError, TypeError):
+            continue
+    if not events:
+        return out
+
+    events.sort(key=lambda e: e["block"])
+    first, last = events[0], events[-1]
+    out.update({
+        "is_rebase": True,
+        "rebase_count": len(events),
+        "first_block": first["block"],
+        "last_block": last["block"],
+        "supply_at_first_rebase": first["supply"],
+        "supply_at_last_rebase": last["supply"],
+        "growth_factor": (last["supply"] / first["supply"]) if first["supply"] else None,
+        "current_supply": units(current_supply, decimals),
+    })
+
+    # Gaps say more than the count: a long dormancy followed by a burst is a
+    # different story from steady operation, and the reader should see it.
+    gaps = [(events[i]["block"] - events[i - 1]["block"], i) for i in range(1, len(events))]
+    if gaps:
+        widest, idx = max(gaps)
+        out["largest_gap_blocks"] = widest
+        out["largest_gap_between"] = (events[idx - 1]["block"], events[idx]["block"])
+    return out
+
+
 def section_stuck_assets(chain, token, decimals):
     """Assets sitting in the token contract itself — usually sent by mistake,
     and only retrievable if the contract exposes a working recovery path."""
@@ -498,8 +559,14 @@ def render(p):
     print(f"\n  {idn.get('name') or '?'} ({idn.get('symbol') or '?'})")
     print(f"  {p['address']}")
 
+    reb = p.get("supply_mechanics") or {}
+
     hr("IDENTITY")
-    print(f"  total supply   : {supply:,.0f}" if supply else "  total supply   : n/d")
+    if supply:
+        flag = "   << ELASTIC — see SUPPLY MECHANICS" if reb.get("is_rebase") else ""
+        print(f"  total supply   : {supply:,.0f}{flag}")
+    else:
+        print("  total supply   : n/d")
     print(f"  decimals       : {dec}")
     print(f"  verified       : {idn.get('is_verified')}")
     proxy = idn.get("proxy_type")
@@ -538,6 +605,27 @@ def render(p):
                 print(f"  history        : {len(real)} transfer(s) after deployment")
                 for e in real[-4:]:
                     print(f"                   block {e['block']}: {short(e['from'])} → {short(e['to'])}")
+
+    if reb.get("is_rebase"):
+        hr("SUPPLY MECHANICS — ELASTIC")
+        print("  This token's supply is rescaled by a monetary policy. Balances move")
+        print("  with it, so the figure above is a snapshot, not a fixed quantity.")
+        print()
+        print(f"  rebase events  : {reb['rebase_count']}")
+        if reb.get("monetary_policy"):
+            print(f"  monetary policy: {reb['monetary_policy']}")
+        print(f"  first rebase   : block {reb['first_block']:,} → {reb['supply_at_first_rebase']:,.2f}")
+        print(f"  latest rebase  : block {reb['last_block']:,} → {reb['supply_at_last_rebase']:,.2f}")
+        g = reb.get("growth_factor")
+        if g:
+            print(f"  growth         : {g:,.1f}x across all rebases")
+        gap = reb.get("largest_gap_blocks")
+        if gap and gap > 100_000:
+            a, b = reb["largest_gap_between"]
+            print(f"  longest pause  : {gap:,} blocks (between {a:,} and {b:,})")
+        print()
+        print("  Market data for rebase tokens is frequently stale. Verify any supply")
+        print("  or share-of-supply figure against the chain before relying on it.")
 
     dep = p.get("deployer") or {}
     if dep.get("address"):
@@ -649,6 +737,8 @@ def main():
     creator = profile["identity"].get("creator")
     dec = profile["identity"].get("decimals") or 18
 
+    profile["supply_mechanics"] = section_supply_mechanics(
+        chain, addr, dec, profile["identity"].get("total_supply"))
     profile["ownership"] = section_ownership(chain, addr, creator)
     profile["deployer"] = section_deployer(chain, creator)
     profile["distribution"] = section_distribution(chain, addr, creator, dec)
