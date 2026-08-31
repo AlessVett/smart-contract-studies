@@ -8,6 +8,7 @@ A comprehensive repository for analyzing and studying various smart contracts ac
 |---|---|---|---|---|
 | [Rexas Finance (RXS)](tokens/RXS/) | tokens | Ethereum | [`0x9eAeBd7E…550e224c`](https://etherscan.io/address/0x9eaebd7e73d97e78c77fab743e6ffa1b550e224c) | Static code analysis + on-chain forensic analysis |
 | [Rexas Presale](defi/RexasPresale/) | defi | Ethereum | [`0xa9502665…15fB16F6`](https://etherscan.io/address/0xa9502665b39b0e61F2CbbFfAD139688615fB16F6) | Security analysis of the $56M token sale that distributed RXS |
+| [LEASH (Doge Killer)](tokens/LEASH/) | tokens | Ethereum | [`0x27C70Cd1…8b546634`](https://etherscan.io/address/0x27C70Cd1946795B66be9d954418546998b546634) | Elastic supply: 311 consecutive rebases, and a control chain that can be restarted but not stopped |
 
 ## Repository Structure
 
